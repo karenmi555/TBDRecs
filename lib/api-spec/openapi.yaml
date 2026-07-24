@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: TBD Recommendations API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User operations
+  - name: suggestions
+    description: Recommendation operations
+  - name: comments
+    description: Comment operations
+  - name: summary
+    description: Summary operations
 paths:
   /healthz:
     get:
@@ -24,6 +32,165 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List all users
+      description: Returns all known users for the name picker
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Create or find a user by name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: User created or found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /suggestions:
+    get:
+      operationId: listSuggestions
+      tags: [suggestions]
+      summary: List suggestions
+      description: List all suggestions, optionally filtered by category
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [book, movie, tv]
+      responses:
+        "200":
+          description: List of suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Suggestion"
+    post:
+      operationId: createSuggestion
+      tags: [suggestions]
+      summary: Create a suggestion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestionInput"
+      responses:
+        "201":
+          description: Suggestion created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Suggestion"
+
+  /suggestions/{id}:
+    get:
+      operationId: getSuggestion
+      tags: [suggestions]
+      summary: Get a suggestion with its comments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Suggestion with comments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuggestionDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteSuggestion
+      tags: [suggestions]
+      summary: Delete a suggestion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /comments:
+    post:
+      operationId: createComment
+      tags: [comments]
+      summary: Add a comment to a suggestion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentInput"
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+
+  /comments/{id}:
+    delete:
+      operationId: deleteComment
+      tags: [comments]
+      summary: Delete a comment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /summary:
+    get:
+      operationId: getSummary
+      tags: [summary]
+      summary: Get recommendation counts by category
+      responses:
+        "200":
+          description: Summary counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Summary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +201,140 @@ components:
       required:
         - status
 
+    User:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    UserInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    Suggestion:
+      type: object
+      required: [id, userId, userName, category, title, description, commentCount, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        userName:
+          type: string
+        category:
+          type: string
+          enum: [book, movie, tv]
+        title:
+          type: string
+        description:
+          type: string
+        commentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    SuggestionInput:
+      type: object
+      required: [userId, category, title, description]
+      properties:
+        userId:
+          type: integer
+        category:
+          type: string
+          enum: [book, movie, tv]
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          minLength: 1
+
+    SuggestionDetail:
+      type: object
+      required: [id, userId, userName, category, title, description, commentCount, createdAt, comments]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        userName:
+          type: string
+        category:
+          type: string
+          enum: [book, movie, tv]
+        title:
+          type: string
+        description:
+          type: string
+        commentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+
+    Comment:
+      type: object
+      required: [id, suggestionId, userId, userName, content, createdAt]
+      properties:
+        id:
+          type: integer
+        suggestionId:
+          type: integer
+        userId:
+          type: integer
+        userName:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CommentInput:
+      type: object
+      required: [suggestionId, userId, content]
+      properties:
+        suggestionId:
+          type: integer
+        userId:
+          type: integer
+        content:
+          type: string
+          minLength: 1
+
+    Summary:
+      type: object
+      required: [total, books, movies, tv]
+      properties:
+        total:
+          type: integer
+        books:
+          type: integer
+        movies:
+          type: integer
+        tv:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

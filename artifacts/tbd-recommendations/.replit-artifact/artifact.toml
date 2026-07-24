@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "TBD Recommendations"
+version = "1.0.0"
+id = "artifacts/tbd-recommendations"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26265
+
+[services.development]
+run = "pnpm --filter @workspace/tbd-recommendations run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/tbd-recommendations", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/tbd-recommendations/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26265"
+BASE_PATH = "/"
