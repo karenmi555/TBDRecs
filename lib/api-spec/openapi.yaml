@@ -163,6 +163,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/Comment"
 
+  /users/{id}:
+    delete:
+      operationId: deleteUser
+      tags: [users]
+      summary: Delete a user and all their content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
   /comments/{id}:
     delete:
       operationId: deleteComment

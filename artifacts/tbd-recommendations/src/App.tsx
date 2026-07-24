@@ -7,6 +7,7 @@ import Welcome from '@/pages/welcome';
 import Home from '@/pages/home';
 import Category from '@/pages/category';
 import SuggestionDetail from '@/pages/suggestion';
+import Admin from '@/pages/admin';
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/home" component={Home} />
       <Route path="/category/:category" component={Category} />
       <Route path="/suggestions/:id" component={SuggestionDetail} />
+      <Route path="/TBDAdmin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );

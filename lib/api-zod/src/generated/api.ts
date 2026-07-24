@@ -155,6 +155,16 @@ export const CreateCommentResponse = zod.object({
 
 
 /**
+ * @summary Delete a user and all their content
+ */
+export const DeleteUserParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteUserResponse = zod.void()
+
+
+/**
  * @summary Delete a comment
  */
 export const DeleteCommentParams = zod.object({
