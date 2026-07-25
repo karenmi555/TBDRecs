@@ -3,7 +3,7 @@ import { useGetSummary } from '@workspace/api-client-react';
 import { useSession } from '@/hooks/use-session';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Film, Tv, LogOut } from 'lucide-react';
+import { BookOpen, Film, Tv, LogOut, UtensilsCrossed } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
 
@@ -46,6 +46,14 @@ export default function Home() {
       icon: Tv,
       count: summary?.tv || 0,
       color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
+    },
+    {
+      id: 'restaurant',
+      title: 'Restaurants',
+      description: 'Meals worth traveling for',
+      icon: UtensilsCrossed,
+      count: summary?.restaurants || 0,
+      color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300',
     },
   ];
 

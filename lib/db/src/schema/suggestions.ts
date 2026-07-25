@@ -6,9 +6,10 @@ import { usersTable } from "./users";
 export const suggestionsTable = pgTable("suggestions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  category: text("category").notNull(), // 'book' | 'movie' | 'tv'
+  category: text("category").notNull(), // 'book' | 'movie' | 'tv' | 'restaurant'
   title: text("title").notNull(),
   description: text("description").notNull(),
+  city: text("city"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

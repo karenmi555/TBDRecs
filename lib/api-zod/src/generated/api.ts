@@ -52,16 +52,17 @@ export const CreateUserResponse = zod.object({
  * @summary List suggestions
  */
 export const ListSuggestionsQueryParams = zod.object({
-  "category": zod.enum(['book', 'movie', 'tv']).optional()
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant']).optional()
 })
 
 export const ListSuggestionsResponseItem = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userName": zod.string(),
-  "category": zod.enum(['book', 'movie', 'tv']),
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant']),
   "title": zod.string(),
   "description": zod.string(),
+  "city": zod.string().nullish(),
   "commentCount": zod.number(),
   "createdAt": zod.coerce.date()
 })
@@ -78,18 +79,20 @@ export const createSuggestionBodyTitleMax = 200;
 
 export const CreateSuggestionBody = zod.object({
   "userId": zod.number(),
-  "category": zod.enum(['book', 'movie', 'tv']),
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant']),
   "title": zod.string().min(1).max(createSuggestionBodyTitleMax),
-  "description": zod.string().min(1)
+  "description": zod.string().min(1),
+  "city": zod.string().optional()
 })
 
 export const CreateSuggestionResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userName": zod.string(),
-  "category": zod.enum(['book', 'movie', 'tv']),
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant']),
   "title": zod.string(),
   "description": zod.string(),
+  "city": zod.string().nullish(),
   "commentCount": zod.number(),
   "createdAt": zod.coerce.date()
 })
@@ -106,9 +109,10 @@ export const GetSuggestionResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userName": zod.string(),
-  "category": zod.enum(['book', 'movie', 'tv']),
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant']),
   "title": zod.string(),
   "description": zod.string(),
+  "city": zod.string().nullish(),
   "commentCount": zod.number(),
   "createdAt": zod.coerce.date(),
   "comments": zod.array(zod.object({
@@ -181,7 +185,8 @@ export const GetSummaryResponse = zod.object({
   "total": zod.number(),
   "books": zod.number(),
   "movies": zod.number(),
-  "tv": zod.number()
+  "tv": zod.number(),
+  "restaurants": zod.number()
 })
 
 

@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, sql, desc } from "drizzle-orm";
+import { eq, sql, desc, asc } from "drizzle-orm";
 import { db, suggestionsTable, usersTable, commentsTable } from "@workspace/db";
 import {
   CreateSuggestionBody,
@@ -40,7 +40,14 @@ router.get("/suggestions", async (req, res): Promise<void> => {
     .leftJoin(commentsTable, eq(commentsTable.suggestionId, suggestionsTable.id))
     .where(conditions)
     .groupBy(suggestionsTable.id, usersTable.name)
-    .orderBy(desc(suggestionsTable.createdAt));
+    .orderBy(
+      query.data.category === "restaurant"
+        ? asc(suggestionsTable.city)
+        : desc(suggestionsTable.createdAt),
+      query.data.category === "restaurant"
+        ? asc(suggestionsTable.title)
+        : desc(suggestionsTable.createdAt)
+    );
 
   res.json(ListSuggestionsResponse.parse(rows));
 });

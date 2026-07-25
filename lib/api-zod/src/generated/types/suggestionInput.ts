@@ -17,4 +17,5 @@ export interface SuggestionInput {
   title: string;
   /** @minLength 1 */
   description: string;
+  city?: string;
 }

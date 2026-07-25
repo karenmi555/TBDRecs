@@ -12,6 +12,7 @@ router.get("/summary", async (_req, res): Promise<void> => {
       books: sql<number>`cast(sum(case when ${suggestionsTable.category} = 'book' then 1 else 0 end) as int)`,
       movies: sql<number>`cast(sum(case when ${suggestionsTable.category} = 'movie' then 1 else 0 end) as int)`,
       tv: sql<number>`cast(sum(case when ${suggestionsTable.category} = 'tv' then 1 else 0 end) as int)`,
+      restaurants: sql<number>`cast(sum(case when ${suggestionsTable.category} = 'restaurant' then 1 else 0 end) as int)`,
     })
     .from(suggestionsTable);
 
@@ -20,6 +21,7 @@ router.get("/summary", async (_req, res): Promise<void> => {
     books: counts.books ?? 0,
     movies: counts.movies ?? 0,
     tv: counts.tv ?? 0,
+    restaurants: counts.restaurants ?? 0,
   }));
 });
 

@@ -13,7 +13,7 @@ import {
 import { useSession } from '@/hooks/use-session';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Trash2, MessageSquare, Clock } from 'lucide-react';
+import { ArrowLeft, Trash2, MessageSquare, Clock, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 
@@ -111,7 +111,7 @@ export default function SuggestionDetail() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-3xl">
           <Link href={`/category/${suggestion.category}`} className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to {suggestion.category === 'book' ? 'Books' : suggestion.category === 'movie' ? 'Movies' : 'TV Shows'}
+            Back to {suggestion.category === 'book' ? 'Books' : suggestion.category === 'movie' ? 'Movies' : suggestion.category === 'restaurant' ? 'Restaurants' : 'TV Shows'}
           </Link>
           
           {isOwner && (
@@ -144,6 +144,15 @@ export default function SuggestionDetail() {
                   year: 'numeric', month: 'long', day: 'numeric' 
                 })}
               </span>
+              {suggestion.city && (
+                <>
+                  <span>•</span>
+                  <span className="flex items-center font-medium text-foreground">
+                    <MapPin className="w-3.5 h-3.5 mr-1 inline" />
+                    {suggestion.city}
+                  </span>
+                </>
+              )}
             </div>
           </div>
           

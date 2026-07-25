@@ -11,4 +11,5 @@ export interface Summary {
   books: number;
   movies: number;
   tv: number;
+  restaurants: number;
 }

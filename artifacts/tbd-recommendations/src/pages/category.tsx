@@ -15,18 +15,19 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { BookOpen, Film, Tv, ArrowLeft, MessageCircle, Plus } from 'lucide-react';
+import { BookOpen, Film, Tv, UtensilsCrossed, ArrowLeft, MessageCircle, Plus, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CATEGORY_MAP = {
   book: { title: 'Books', icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-50' },
   movie: { title: 'Movies', icon: Film, color: 'text-purple-500', bg: 'bg-purple-50' },
   tv: { title: 'TV Shows', icon: Tv, color: 'text-indigo-500', bg: 'bg-indigo-50' },
+  restaurant: { title: 'Restaurants', icon: UtensilsCrossed, color: 'text-violet-500', bg: 'bg-violet-50' },
 } as const;
 
 export default function Category() {
   const params = useParams();
-  const categoryId = params.category as 'book' | 'movie' | 'tv';
+  const categoryId = params.category as 'book' | 'movie' | 'tv' | 'restaurant';
   const [, setLocation] = useLocation();
   const { user, isLoaded } = useSession();
   const queryClient = useQueryClient();
@@ -34,6 +35,8 @@ export default function Category() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
+  const [newCity, setNewCity] = useState('');
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
   const { data: suggestions, isLoading } = useListSuggestions(
     { category: categoryId }, 
@@ -46,7 +49,7 @@ export default function Category() {
     if (isLoaded && !user) {
       setLocation('/');
     }
-    if (categoryId && !['book', 'movie', 'tv'].includes(categoryId)) {
+    if (categoryId && !['book', 'movie', 'tv', 'restaurant'].includes(categoryId)) {
       setLocation('/home');
     }
   }, [user, isLoaded, setLocation, categoryId]);
@@ -57,23 +60,35 @@ export default function Category() {
 
   const catInfo = CATEGORY_MAP[categoryId];
   const Icon = catInfo.icon;
+  const isRestaurant = categoryId === 'restaurant';
+
+  // Derive sorted/filtered list for restaurants
+  const allCities = isRestaurant
+    ? Array.from(new Set((suggestions ?? []).map(s => s.city ?? '').filter(Boolean))).sort()
+    : [];
+  const visibleSuggestions = isRestaurant && selectedCity
+    ? (suggestions ?? []).filter(s => s.city === selectedCity)
+    : (suggestions ?? []);
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim() || !newDesc.trim()) return;
+    if (isRestaurant && !newCity.trim()) return;
 
     createSuggestion.mutate({
       data: {
         userId: user.id,
         category: categoryId,
         title: newTitle.trim(),
-        description: newDesc.trim()
+        description: newDesc.trim(),
+        ...(isRestaurant ? { city: newCity.trim() } : {}),
       }
     }, {
       onSuccess: () => {
         setIsAddOpen(false);
         setNewTitle('');
         setNewDesc('');
+        setNewCity('');
         queryClient.invalidateQueries({ queryKey: getListSuggestionsQueryKey({ category: categoryId }) });
         queryClient.invalidateQueries({ queryKey: getGetSummaryQueryKey() });
       }
@@ -116,24 +131,35 @@ export default function Category() {
             <DialogContent className="sm:max-w-md">
               <form onSubmit={handleAdd}>
                 <DialogHeader>
-                  <DialogTitle>Add a {catInfo.title.slice(0, -1)}</DialogTitle>
+                  <DialogTitle>Add a {isRestaurant ? 'Restaurant' : catInfo.title.slice(0, -1)}</DialogTitle>
                   <DialogDescription>
                     Share something you loved with the group.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title">{isRestaurant ? 'Restaurant name' : 'Title'}</Label>
                     <Input 
                       id="title" 
-                      placeholder={`e.g., The Midnight Library`} 
+                      placeholder={isRestaurant ? 'e.g., Nobu' : 'e.g., The Midnight Library'} 
                       value={newTitle}
                       onChange={e => setNewTitle(e.target.value)}
                       autoFocus
                     />
                   </div>
+                  {isRestaurant && (
+                    <div className="space-y-2">
+                      <Label htmlFor="city">City</Label>
+                      <Input 
+                        id="city" 
+                        placeholder="e.g., New York" 
+                        value={newCity}
+                        onChange={e => setNewCity(e.target.value)}
+                      />
+                    </div>
+                  )}
                   <div className="space-y-2">
-                    <Label htmlFor="desc">Why should we {categoryId === 'book' ? 'read' : 'watch'} this?</Label>
+                    <Label htmlFor="desc">Why do you recommend it?</Label>
                     <Textarea 
                       id="desc" 
                       placeholder="Tell us what you loved about it..." 
@@ -154,7 +180,7 @@ export default function Category() {
                   </Button>
                   <Button 
                     type="submit" 
-                    disabled={!newTitle.trim() || !newDesc.trim() || createSuggestion.isPending}
+                    disabled={!newTitle.trim() || !newDesc.trim() || (isRestaurant && !newCity.trim()) || createSuggestion.isPending}
                   >
                     {createSuggestion.isPending ? 'Adding...' : 'Add to list'}
                   </Button>
@@ -163,6 +189,35 @@ export default function Category() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* City filter for restaurants */}
+        {isRestaurant && !isLoading && allCities.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            <button
+              onClick={() => setSelectedCity(null)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                selectedCity === null
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
+              }`}
+            >
+              All cities
+            </button>
+            {allCities.map(city => (
+              <button
+                key={city}
+                onClick={() => setSelectedCity(city === selectedCity ? null : city)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                  selectedCity === city
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
+                }`}
+              >
+                {city}
+              </button>
+            ))}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="space-y-4">
@@ -186,7 +241,7 @@ export default function Category() {
             </div>
             <h3 className="text-xl font-serif mb-2">No recommendations yet</h3>
             <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-              Be the first to share a {catInfo.title.toLowerCase().slice(0, -1)} you love.
+              Be the first to share a {isRestaurant ? 'restaurant' : catInfo.title.toLowerCase().slice(0, -1)} you love.
             </p>
             <Button onClick={() => setIsAddOpen(true)} variant="outline">
               Add the first one
@@ -194,7 +249,7 @@ export default function Category() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {suggestions?.map((suggestion) => (
+            {visibleSuggestions.map((suggestion) => (
               <Link key={suggestion.id} href={`/suggestions/${suggestion.id}`}>
                 <Card className="hover-elevate transition-all duration-200 cursor-pointer border-transparent hover:border-primary/20 shadow-sm hover:shadow-md">
                   <CardHeader className="pb-3">
@@ -203,7 +258,16 @@ export default function Category() {
                         <CardTitle className="text-xl font-serif text-primary mb-1">
                           {suggestion.title}
                         </CardTitle>
-                        <CardDescription className="flex items-center gap-2 text-sm">
+                        <CardDescription className="flex flex-wrap items-center gap-2 text-sm">
+                          {suggestion.city && (
+                            <>
+                              <span className="flex items-center font-medium text-foreground">
+                                <MapPin className="w-3.5 h-3.5 mr-1" />
+                                {suggestion.city}
+                              </span>
+                              <span className="text-muted-foreground/50">•</span>
+                            </>
+                          )}
                           <span className="font-medium text-foreground">Recommended by {suggestion.userName}</span>
                           <span className="text-muted-foreground/50">•</span>
                           <span>{new Date(suggestion.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>

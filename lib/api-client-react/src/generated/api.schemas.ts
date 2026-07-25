@@ -30,6 +30,7 @@ export const SuggestionCategory = {
   book: 'book',
   movie: 'movie',
   tv: 'tv',
+  restaurant: 'restaurant',
 } as const;
 
 export interface Suggestion {
@@ -39,6 +40,8 @@ export interface Suggestion {
   category: SuggestionCategory;
   title: string;
   description: string;
+  /** @nullable */
+  city?: string | null;
   commentCount: number;
   createdAt: string;
 }
@@ -50,6 +53,7 @@ export const SuggestionInputCategory = {
   book: 'book',
   movie: 'movie',
   tv: 'tv',
+  restaurant: 'restaurant',
 } as const;
 
 export interface SuggestionInput {
@@ -62,6 +66,7 @@ export interface SuggestionInput {
   title: string;
   /** @minLength 1 */
   description: string;
+  city?: string;
 }
 
 export type SuggestionDetailCategory = typeof SuggestionDetailCategory[keyof typeof SuggestionDetailCategory];
@@ -71,6 +76,7 @@ export const SuggestionDetailCategory = {
   book: 'book',
   movie: 'movie',
   tv: 'tv',
+  restaurant: 'restaurant',
 } as const;
 
 export interface Comment {
@@ -89,6 +95,8 @@ export interface SuggestionDetail {
   category: SuggestionDetailCategory;
   title: string;
   description: string;
+  /** @nullable */
+  city?: string | null;
   commentCount: number;
   createdAt: string;
   comments: Comment[];
@@ -106,6 +114,7 @@ export interface Summary {
   books: number;
   movies: number;
   tv: number;
+  restaurants: number;
 }
 
 export interface ErrorResponse {
@@ -123,5 +132,6 @@ export const ListSuggestionsCategory = {
   book: 'book',
   movie: 'movie',
   tv: 'tv',
+  restaurant: 'restaurant',
 } as const;
 

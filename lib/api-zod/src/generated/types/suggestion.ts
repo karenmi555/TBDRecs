@@ -14,6 +14,8 @@ export interface Suggestion {
   category: SuggestionCategory;
   title: string;
   description: string;
+  /** @nullable */
+  city?: string | null;
   commentCount: number;
   createdAt: Date;
 }

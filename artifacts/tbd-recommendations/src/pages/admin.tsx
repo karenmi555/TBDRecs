@@ -25,18 +25,20 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Film, Tv, Trash2, Users, ArrowLeft } from 'lucide-react';
+import { BookOpen, Film, Tv, UtensilsCrossed, Trash2, Users, ArrowLeft, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const categoryIcon = (cat: string) => {
   if (cat === 'book') return <BookOpen className="w-3.5 h-3.5" />;
   if (cat === 'movie') return <Film className="w-3.5 h-3.5" />;
+  if (cat === 'restaurant') return <UtensilsCrossed className="w-3.5 h-3.5" />;
   return <Tv className="w-3.5 h-3.5" />;
 };
 
 const categoryLabel = (cat: string) => {
   if (cat === 'book') return 'Book';
   if (cat === 'movie') return 'Movie';
+  if (cat === 'restaurant') return 'Restaurant';
   return 'TV Show';
 };
 
@@ -155,7 +157,11 @@ export default function Admin() {
                           <div className="min-w-0">
                             <p className="font-medium text-sm truncate">{s.title}</p>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              {categoryLabel(s.category)} · recommended by <span className="font-medium">{s.userName}</span>
+                              {categoryLabel(s.category)}
+                              {s.city && (
+                                <span className="inline-flex items-center ml-1"><MapPin className="w-3 h-3 inline mr-0.5" />{s.city}</span>
+                              )}
+                              {' · '}recommended by <span className="font-medium">{s.userName}</span>
                             </p>
                           </div>
                         </div>

@@ -13,4 +13,5 @@ export const SuggestionCategory = {
   book: 'book',
   movie: 'movie',
   tv: 'tv',
+  restaurant: 'restaurant',
 } as const;
