@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useParams, Link } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import { 
@@ -15,7 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { BookOpen, Film, Tv, UtensilsCrossed, BedDouble, ArrowLeft, MessageCircle, Plus, MapPin } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { BookOpen, Film, Tv, UtensilsCrossed, BedDouble, ArrowLeft, MessageCircle, Plus, MapPin, ArrowUpDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CATEGORY_MAP = {
@@ -25,6 +26,8 @@ const CATEGORY_MAP = {
   restaurant: { title: 'Restaurants', icon: UtensilsCrossed, color: 'text-violet-500', bg: 'bg-violet-50' },
   hotel: { title: 'Hotels', icon: BedDouble, color: 'text-rose-500', bg: 'bg-rose-50' },
 } as const;
+
+type SortKey = 'newest' | 'title' | 'city' | 'person';
 
 export default function Category() {
   const params = useParams();
@@ -38,6 +41,7 @@ export default function Category() {
   const [newDesc, setNewDesc] = useState('');
   const [newCity, setNewCity] = useState('');
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>('newest');
 
   const { data: suggestions, isLoading } = useListSuggestions(
     { category: categoryId }, 
@@ -62,14 +66,33 @@ export default function Category() {
   const catInfo = CATEGORY_MAP[categoryId];
   const Icon = catInfo.icon;
   const isCityCategory = categoryId === 'restaurant' || categoryId === 'hotel';
+  const titleLabel = isCityCategory ? 'Name' : 'Title';
 
-  // Derive sorted/filtered list for city-based categories
+  // City filter options
   const allCities = isCityCategory
     ? Array.from(new Set((suggestions ?? []).map(s => s.city ?? '').filter(Boolean))).sort()
     : [];
-  const visibleSuggestions = isCityCategory && selectedCity
-    ? (suggestions ?? []).filter(s => s.city === selectedCity)
-    : (suggestions ?? []);
+
+  // Filter by city, then sort
+  const visibleSuggestions = useMemo(() => {
+    let list = suggestions ?? [];
+    if (isCityCategory && selectedCity) {
+      list = list.filter(s => s.city === selectedCity);
+    }
+    return [...list].sort((a, b) => {
+      switch (sortKey) {
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'city':
+          return (a.city ?? '').localeCompare(b.city ?? '') || a.title.localeCompare(b.title);
+        case 'person':
+          return a.userName.localeCompare(b.userName) || a.title.localeCompare(b.title);
+        case 'newest':
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
+  }, [suggestions, selectedCity, sortKey, isCityCategory]);
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,32 +214,55 @@ export default function Category() {
           </Dialog>
         </div>
 
-        {/* City filter for city-based categories */}
-        {isCityCategory && !isLoading && allCities.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            <button
-              onClick={() => setSelectedCity(null)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                selectedCity === null
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
-              }`}
-            >
-              All cities
-            </button>
-            {allCities.map(city => (
-              <button
-                key={city}
-                onClick={() => setSelectedCity(city === selectedCity ? null : city)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                  selectedCity === city
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
-                }`}
-              >
-                {city}
-              </button>
-            ))}
+        {/* Controls row: city filter + sort */}
+        {!isLoading && (suggestions?.length ?? 0) > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+            {/* City filter pills */}
+            {isCityCategory && allCities.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedCity(null)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    selectedCity === null
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
+                  }`}
+                >
+                  All cities
+                </button>
+                {allCities.map(city => (
+                  <button
+                    key={city}
+                    onClick={() => setSelectedCity(city === selectedCity ? null : city)}
+                    className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                      selectedCity === city
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
+                    }`}
+                  >
+                    {city}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div /> /* spacer so sort stays right-aligned */
+            )}
+
+            {/* Sort dropdown */}
+            <div className="flex items-center gap-2 shrink-0">
+              <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
+              <Select value={sortKey} onValueChange={v => setSortKey(v as SortKey)}>
+                <SelectTrigger className="w-44 h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Most recent</SelectItem>
+                  <SelectItem value="title">{titleLabel} A–Z</SelectItem>
+                  {isCityCategory && <SelectItem value="city">City A–Z</SelectItem>}
+                  <SelectItem value="person">Who shared it</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         )}
 
@@ -269,7 +315,7 @@ export default function Category() {
                               <span className="text-muted-foreground/50">•</span>
                             </>
                           )}
-                          <span className="font-medium text-foreground">Recommended by {suggestion.userName}</span>
+                          <span className="font-medium text-foreground">Shared by {suggestion.userName}</span>
                           <span className="text-muted-foreground/50">•</span>
                           <span>{new Date(suggestion.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         </CardDescription>
