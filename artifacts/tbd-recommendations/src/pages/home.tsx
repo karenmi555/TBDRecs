@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BookOpen, Film, Tv, LogOut, UtensilsCrossed, BedDouble } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
+import { ExportDialog } from '@/components/export-dialog';
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -75,10 +76,11 @@ export default function Home() {
             </div>
             <span className="font-serif font-semibold text-lg hidden sm:inline-block">TBD Recs</span>
           </div>
-          <div className="flex items-center gap-4 text-sm">
-            <span className="text-muted-foreground">
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-muted-foreground hidden sm:inline">
               Hello, <strong className="text-foreground font-medium">{user.name}</strong>
             </span>
+            <ExportDialog />
             <Button variant="ghost" size="sm" onClick={logout} className="text-muted-foreground hover:text-foreground">
               <LogOut className="w-4 h-4 mr-2" />
               Switch user
