@@ -41,10 +41,10 @@ router.get("/suggestions", async (req, res): Promise<void> => {
     .where(conditions)
     .groupBy(suggestionsTable.id, usersTable.name)
     .orderBy(
-      query.data.category === "restaurant"
+      ["restaurant", "hotel"].includes(query.data.category ?? "")
         ? asc(suggestionsTable.city)
         : desc(suggestionsTable.createdAt),
-      query.data.category === "restaurant"
+      ["restaurant", "hotel"].includes(query.data.category ?? "")
         ? asc(suggestionsTable.title)
         : desc(suggestionsTable.createdAt)
     );

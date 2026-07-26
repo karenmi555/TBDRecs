@@ -3,7 +3,7 @@ import { useGetSummary } from '@workspace/api-client-react';
 import { useSession } from '@/hooks/use-session';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Film, Tv, LogOut, UtensilsCrossed } from 'lucide-react';
+import { BookOpen, Film, Tv, LogOut, UtensilsCrossed, BedDouble } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
 
@@ -54,6 +54,14 @@ export default function Home() {
       icon: UtensilsCrossed,
       count: summary?.restaurants || 0,
       color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300',
+    },
+    {
+      id: 'hotel',
+      title: 'Hotels',
+      description: 'Places we loved waking up in',
+      icon: BedDouble,
+      count: summary?.hotels || 0,
+      color: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300',
     },
   ];
 

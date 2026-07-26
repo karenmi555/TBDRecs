@@ -12,4 +12,5 @@ export interface Summary {
   movies: number;
   tv: number;
   restaurants: number;
+  hotels: number;
 }

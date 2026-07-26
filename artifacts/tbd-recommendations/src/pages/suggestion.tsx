@@ -111,7 +111,7 @@ export default function SuggestionDetail() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-3xl">
           <Link href={`/category/${suggestion.category}`} className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to {suggestion.category === 'book' ? 'Books' : suggestion.category === 'movie' ? 'Movies' : suggestion.category === 'restaurant' ? 'Restaurants' : 'TV Shows'}
+            Back to {suggestion.category === 'book' ? 'Books' : suggestion.category === 'movie' ? 'Movies' : suggestion.category === 'restaurant' ? 'Restaurants' : suggestion.category === 'hotel' ? 'Hotels' : 'TV Shows'}
           </Link>
           
           {isOwner && (

@@ -14,4 +14,5 @@ export const SuggestionInputCategory = {
   movie: 'movie',
   tv: 'tv',
   restaurant: 'restaurant',
+  hotel: 'hotel',
 } as const;

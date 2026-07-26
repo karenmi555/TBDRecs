@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { BookOpen, Film, Tv, UtensilsCrossed, ArrowLeft, MessageCircle, Plus, MapPin } from 'lucide-react';
+import { BookOpen, Film, Tv, UtensilsCrossed, BedDouble, ArrowLeft, MessageCircle, Plus, MapPin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CATEGORY_MAP = {
@@ -23,11 +23,12 @@ const CATEGORY_MAP = {
   movie: { title: 'Movies', icon: Film, color: 'text-purple-500', bg: 'bg-purple-50' },
   tv: { title: 'TV Shows', icon: Tv, color: 'text-indigo-500', bg: 'bg-indigo-50' },
   restaurant: { title: 'Restaurants', icon: UtensilsCrossed, color: 'text-violet-500', bg: 'bg-violet-50' },
+  hotel: { title: 'Hotels', icon: BedDouble, color: 'text-rose-500', bg: 'bg-rose-50' },
 } as const;
 
 export default function Category() {
   const params = useParams();
-  const categoryId = params.category as 'book' | 'movie' | 'tv' | 'restaurant';
+  const categoryId = params.category as 'book' | 'movie' | 'tv' | 'restaurant' | 'hotel';
   const [, setLocation] = useLocation();
   const { user, isLoaded } = useSession();
   const queryClient = useQueryClient();
@@ -49,7 +50,7 @@ export default function Category() {
     if (isLoaded && !user) {
       setLocation('/');
     }
-    if (categoryId && !['book', 'movie', 'tv', 'restaurant'].includes(categoryId)) {
+    if (categoryId && !['book', 'movie', 'tv', 'restaurant', 'hotel'].includes(categoryId)) {
       setLocation('/home');
     }
   }, [user, isLoaded, setLocation, categoryId]);
@@ -60,20 +61,20 @@ export default function Category() {
 
   const catInfo = CATEGORY_MAP[categoryId];
   const Icon = catInfo.icon;
-  const isRestaurant = categoryId === 'restaurant';
+  const isCityCategory = categoryId === 'restaurant' || categoryId === 'hotel';
 
-  // Derive sorted/filtered list for restaurants
-  const allCities = isRestaurant
+  // Derive sorted/filtered list for city-based categories
+  const allCities = isCityCategory
     ? Array.from(new Set((suggestions ?? []).map(s => s.city ?? '').filter(Boolean))).sort()
     : [];
-  const visibleSuggestions = isRestaurant && selectedCity
+  const visibleSuggestions = isCityCategory && selectedCity
     ? (suggestions ?? []).filter(s => s.city === selectedCity)
     : (suggestions ?? []);
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim() || !newDesc.trim()) return;
-    if (isRestaurant && !newCity.trim()) return;
+    if (isCityCategory && !newCity.trim()) return;
 
     createSuggestion.mutate({
       data: {
@@ -81,7 +82,7 @@ export default function Category() {
         category: categoryId,
         title: newTitle.trim(),
         description: newDesc.trim(),
-        ...(isRestaurant ? { city: newCity.trim() } : {}),
+        ...(isCityCategory ? { city: newCity.trim() } : {}),
       }
     }, {
       onSuccess: () => {
@@ -131,23 +132,23 @@ export default function Category() {
             <DialogContent className="sm:max-w-md">
               <form onSubmit={handleAdd}>
                 <DialogHeader>
-                  <DialogTitle>Add a {isRestaurant ? 'Restaurant' : catInfo.title.slice(0, -1)}</DialogTitle>
+                  <DialogTitle>Add a {categoryId === 'restaurant' ? 'Restaurant' : categoryId === 'hotel' ? 'Hotel' : catInfo.title.slice(0, -1)}</DialogTitle>
                   <DialogDescription>
                     Share something you loved with the group.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">{isRestaurant ? 'Restaurant name' : 'Title'}</Label>
+                    <Label htmlFor="title">{categoryId === 'restaurant' ? 'Restaurant name' : categoryId === 'hotel' ? 'Hotel name' : 'Title'}</Label>
                     <Input 
                       id="title" 
-                      placeholder={isRestaurant ? 'e.g., Nobu' : 'e.g., The Midnight Library'} 
+                      placeholder={categoryId === 'restaurant' ? 'e.g., Nobu' : categoryId === 'hotel' ? 'e.g., Hôtel du Cap-Eden-Roc' : 'e.g., The Midnight Library'} 
                       value={newTitle}
                       onChange={e => setNewTitle(e.target.value)}
                       autoFocus
                     />
                   </div>
-                  {isRestaurant && (
+                  {isCityCategory && (
                     <div className="space-y-2">
                       <Label htmlFor="city">City</Label>
                       <Input 
@@ -180,7 +181,7 @@ export default function Category() {
                   </Button>
                   <Button 
                     type="submit" 
-                    disabled={!newTitle.trim() || !newDesc.trim() || (isRestaurant && !newCity.trim()) || createSuggestion.isPending}
+                    disabled={!newTitle.trim() || !newDesc.trim() || (isCityCategory && !newCity.trim()) || createSuggestion.isPending}
                   >
                     {createSuggestion.isPending ? 'Adding...' : 'Add to list'}
                   </Button>
@@ -190,8 +191,8 @@ export default function Category() {
           </Dialog>
         </div>
 
-        {/* City filter for restaurants */}
-        {isRestaurant && !isLoading && allCities.length > 0 && (
+        {/* City filter for city-based categories */}
+        {isCityCategory && !isLoading && allCities.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-8">
             <button
               onClick={() => setSelectedCity(null)}
@@ -241,7 +242,7 @@ export default function Category() {
             </div>
             <h3 className="text-xl font-serif mb-2">No recommendations yet</h3>
             <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-              Be the first to share a {isRestaurant ? 'restaurant' : catInfo.title.toLowerCase().slice(0, -1)} you love.
+              Be the first to share a {categoryId === 'restaurant' ? 'restaurant' : categoryId === 'hotel' ? 'hotel' : catInfo.title.toLowerCase().slice(0, -1)} you love.
             </p>
             <Button onClick={() => setIsAddOpen(true)} variant="outline">
               Add the first one
