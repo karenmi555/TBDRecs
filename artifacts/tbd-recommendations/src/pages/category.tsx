@@ -59,12 +59,6 @@ export default function Category() {
     }
   }, [user, isLoaded, setLocation, categoryId]);
 
-  if (!isLoaded || !user || !CATEGORY_MAP[categoryId]) {
-    return null;
-  }
-
-  const catInfo = CATEGORY_MAP[categoryId];
-  const Icon = catInfo.icon;
   const isCityCategory = categoryId === 'restaurant' || categoryId === 'hotel';
   const titleLabel = isCityCategory ? 'Name' : 'Title';
 
@@ -73,7 +67,7 @@ export default function Category() {
     ? Array.from(new Set((suggestions ?? []).map(s => s.city ?? '').filter(Boolean))).sort()
     : [];
 
-  // Filter by city, then sort
+  // Filter by city, then sort — must be before any early return
   const visibleSuggestions = useMemo(() => {
     let list = suggestions ?? [];
     if (isCityCategory && selectedCity) {
@@ -93,6 +87,13 @@ export default function Category() {
       }
     });
   }, [suggestions, selectedCity, sortKey, isCityCategory]);
+
+  if (!isLoaded || !user || !CATEGORY_MAP[categoryId]) {
+    return null;
+  }
+
+  const catInfo = CATEGORY_MAP[categoryId];
+  const Icon = catInfo.icon;
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
