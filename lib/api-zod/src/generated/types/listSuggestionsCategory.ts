@@ -15,4 +15,5 @@ export const ListSuggestionsCategory = {
   tv: 'tv',
   restaurant: 'restaurant',
   hotel: 'hotel',
+  other: 'other',
 } as const;

@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BookOpen, Film, Tv, UtensilsCrossed, BedDouble, ArrowLeft, MessageCircle, Plus, MapPin, ArrowUpDown } from 'lucide-react';
+import { BookOpen, Film, Tv, UtensilsCrossed, BedDouble, Sparkles, ArrowLeft, MessageCircle, Plus, MapPin, ArrowUpDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CATEGORY_MAP = {
@@ -25,13 +25,14 @@ const CATEGORY_MAP = {
   tv: { title: 'TV Shows', icon: Tv, color: 'text-indigo-500', bg: 'bg-indigo-50' },
   restaurant: { title: 'Restaurants', icon: UtensilsCrossed, color: 'text-violet-500', bg: 'bg-violet-50' },
   hotel: { title: 'Hotels', icon: BedDouble, color: 'text-rose-500', bg: 'bg-rose-50' },
+  other: { title: 'Other', icon: Sparkles, color: 'text-amber-500', bg: 'bg-amber-50' },
 } as const;
 
 type SortKey = 'newest' | 'title' | 'city' | 'person';
 
 export default function Category() {
   const params = useParams();
-  const categoryId = params.category as 'book' | 'movie' | 'tv' | 'restaurant' | 'hotel';
+  const categoryId = params.category as 'book' | 'movie' | 'tv' | 'restaurant' | 'hotel' | 'other';
   const [, setLocation] = useLocation();
   const { user, isLoaded } = useSession();
   const queryClient = useQueryClient();
@@ -54,7 +55,7 @@ export default function Category() {
     if (isLoaded && !user) {
       setLocation('/');
     }
-    if (categoryId && !['book', 'movie', 'tv', 'restaurant', 'hotel'].includes(categoryId)) {
+    if (categoryId && !['book', 'movie', 'tv', 'restaurant', 'hotel', 'other'].includes(categoryId)) {
       setLocation('/home');
     }
   }, [user, isLoaded, setLocation, categoryId]);
@@ -156,7 +157,7 @@ export default function Category() {
             <DialogContent className="sm:max-w-md">
               <form onSubmit={handleAdd}>
                 <DialogHeader>
-                  <DialogTitle>Add a {categoryId === 'restaurant' ? 'Restaurant' : categoryId === 'hotel' ? 'Hotel' : catInfo.title.slice(0, -1)}</DialogTitle>
+                  <DialogTitle>Add a{categoryId === 'other' ? 'n' : ''} {categoryId === 'restaurant' ? 'Restaurant' : categoryId === 'hotel' ? 'Hotel' : categoryId === 'other' ? 'Recommendation' : catInfo.title.slice(0, -1)}</DialogTitle>
                   <DialogDescription>
                     Share something you loved with the group.
                   </DialogDescription>
@@ -166,7 +167,7 @@ export default function Category() {
                     <Label htmlFor="title">{categoryId === 'restaurant' ? 'Restaurant name' : categoryId === 'hotel' ? 'Hotel name' : 'Title'}</Label>
                     <Input 
                       id="title" 
-                      placeholder={categoryId === 'restaurant' ? 'e.g., Nobu' : categoryId === 'hotel' ? 'e.g., Hôtel du Cap-Eden-Roc' : 'e.g., The Midnight Library'} 
+                      placeholder={categoryId === 'restaurant' ? 'e.g., Nobu' : categoryId === 'hotel' ? 'e.g., Hôtel du Cap-Eden-Roc' : categoryId === 'other' ? 'e.g., Spotify playlist, yoga studio…' : 'e.g., The Midnight Library'} 
                       value={newTitle}
                       onChange={e => setNewTitle(e.target.value)}
                       autoFocus
@@ -289,7 +290,7 @@ export default function Category() {
             </div>
             <h3 className="text-xl font-serif mb-2">No recommendations yet</h3>
             <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-              Be the first to share a {categoryId === 'restaurant' ? 'restaurant' : categoryId === 'hotel' ? 'hotel' : catInfo.title.toLowerCase().slice(0, -1)} you love.
+              Be the first to share {categoryId === 'other' ? 'something' : `a ${categoryId === 'restaurant' ? 'restaurant' : categoryId === 'hotel' ? 'hotel' : catInfo.title.toLowerCase().slice(0, -1)}`} you love.
             </p>
             <Button onClick={() => setIsAddOpen(true)} variant="outline">
               Add the first one

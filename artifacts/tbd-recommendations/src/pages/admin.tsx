@@ -25,7 +25,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Film, Tv, UtensilsCrossed, BedDouble, Trash2, Users, ArrowLeft, MapPin } from 'lucide-react';
+import { BookOpen, Film, Tv, UtensilsCrossed, BedDouble, Sparkles, Trash2, Users, ArrowLeft, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const categoryIcon = (cat: string) => {
@@ -33,6 +33,7 @@ const categoryIcon = (cat: string) => {
   if (cat === 'movie') return <Film className="w-3.5 h-3.5" />;
   if (cat === 'restaurant') return <UtensilsCrossed className="w-3.5 h-3.5" />;
   if (cat === 'hotel') return <BedDouble className="w-3.5 h-3.5" />;
+  if (cat === 'other') return <Sparkles className="w-3.5 h-3.5" />;
   return <Tv className="w-3.5 h-3.5" />;
 };
 
@@ -41,6 +42,7 @@ const categoryLabel = (cat: string) => {
   if (cat === 'movie') return 'Movie';
   if (cat === 'restaurant') return 'Restaurant';
   if (cat === 'hotel') return 'Hotel';
+  if (cat === 'other') return 'Other';
   return 'TV Show';
 };
 

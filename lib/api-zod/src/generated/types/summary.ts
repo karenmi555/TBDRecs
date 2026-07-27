@@ -13,4 +13,5 @@ export interface Summary {
   tv: number;
   restaurants: number;
   hotels: number;
+  others: number;
 }

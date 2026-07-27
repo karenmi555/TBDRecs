@@ -32,6 +32,7 @@ export const SuggestionCategory = {
   tv: 'tv',
   restaurant: 'restaurant',
   hotel: 'hotel',
+  other: 'other',
 } as const;
 
 export interface Suggestion {
@@ -56,6 +57,7 @@ export const SuggestionInputCategory = {
   tv: 'tv',
   restaurant: 'restaurant',
   hotel: 'hotel',
+  other: 'other',
 } as const;
 
 export interface SuggestionInput {
@@ -80,6 +82,7 @@ export const SuggestionDetailCategory = {
   tv: 'tv',
   restaurant: 'restaurant',
   hotel: 'hotel',
+  other: 'other',
 } as const;
 
 export interface Comment {
@@ -119,6 +122,7 @@ export interface Summary {
   tv: number;
   restaurants: number;
   hotels: number;
+  others: number;
 }
 
 export interface ErrorResponse {
@@ -138,5 +142,6 @@ export const ListSuggestionsCategory = {
   tv: 'tv',
   restaurant: 'restaurant',
   hotel: 'hotel',
+  other: 'other',
 } as const;
 

@@ -52,14 +52,14 @@ export const CreateUserResponse = zod.object({
  * @summary List suggestions
  */
 export const ListSuggestionsQueryParams = zod.object({
-  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel']).optional()
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel', 'other']).optional()
 })
 
 export const ListSuggestionsResponseItem = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userName": zod.string(),
-  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel']),
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel', 'other']),
   "title": zod.string(),
   "description": zod.string(),
   "city": zod.string().nullish(),
@@ -79,7 +79,7 @@ export const createSuggestionBodyTitleMax = 200;
 
 export const CreateSuggestionBody = zod.object({
   "userId": zod.number(),
-  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel']),
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel', 'other']),
   "title": zod.string().min(1).max(createSuggestionBodyTitleMax),
   "description": zod.string().min(1),
   "city": zod.string().optional()
@@ -89,7 +89,7 @@ export const CreateSuggestionResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userName": zod.string(),
-  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel']),
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel', 'other']),
   "title": zod.string(),
   "description": zod.string(),
   "city": zod.string().nullish(),
@@ -109,7 +109,7 @@ export const GetSuggestionResponse = zod.object({
   "id": zod.number(),
   "userId": zod.number(),
   "userName": zod.string(),
-  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel']),
+  "category": zod.enum(['book', 'movie', 'tv', 'restaurant', 'hotel', 'other']),
   "title": zod.string(),
   "description": zod.string(),
   "city": zod.string().nullish(),
@@ -187,7 +187,8 @@ export const GetSummaryResponse = zod.object({
   "movies": zod.number(),
   "tv": zod.number(),
   "restaurants": zod.number(),
-  "hotels": zod.number()
+  "hotels": zod.number(),
+  "others": zod.number()
 })
 
 

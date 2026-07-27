@@ -3,7 +3,7 @@ import { useGetSummary } from '@workspace/api-client-react';
 import { useSession } from '@/hooks/use-session';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Film, Tv, LogOut, UtensilsCrossed, BedDouble } from 'lucide-react';
+import { BookOpen, Film, Tv, LogOut, UtensilsCrossed, BedDouble, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
 import { ExportDialog } from '@/components/export-dialog';
@@ -63,6 +63,14 @@ export default function Home() {
       icon: BedDouble,
       count: summary?.hotels || 0,
       color: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300',
+    },
+    {
+      id: 'other',
+      title: 'Other',
+      description: 'Everything else worth sharing',
+      icon: Sparkles,
+      count: summary?.others || 0,
+      color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
     },
   ];
 

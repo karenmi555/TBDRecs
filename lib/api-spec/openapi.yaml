@@ -78,7 +78,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [book, movie, tv, restaurant, hotel]
+            enum: [book, movie, tv, restaurant, hotel, other]
       responses:
         "200":
           description: List of suggestions
@@ -249,7 +249,7 @@ components:
           type: string
         category:
           type: string
-          enum: [book, movie, tv, restaurant, hotel]
+          enum: [book, movie, tv, restaurant, hotel, other]
         title:
           type: string
         description:
@@ -270,7 +270,7 @@ components:
           type: integer
         category:
           type: string
-          enum: [book, movie, tv, restaurant, hotel]
+          enum: [book, movie, tv, restaurant, hotel, other]
         title:
           type: string
           minLength: 1
@@ -293,7 +293,7 @@ components:
           type: string
         category:
           type: string
-          enum: [book, movie, tv, restaurant, hotel]
+          enum: [book, movie, tv, restaurant, hotel, other]
         title:
           type: string
         description:
@@ -342,7 +342,7 @@ components:
 
     Summary:
       type: object
-      required: [total, books, movies, tv, restaurants, hotels]
+      required: [total, books, movies, tv, restaurants, hotels, others]
       properties:
         total:
           type: integer
@@ -355,6 +355,8 @@ components:
         restaurants:
           type: integer
         hotels:
+          type: integer
+        others:
           type: integer
 
     ErrorResponse:
