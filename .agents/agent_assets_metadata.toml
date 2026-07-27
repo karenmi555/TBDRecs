@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "ptvkdY02z7iuinAQVaAMe"
+uri = "file://TBD-Recommendations-PRD.md"
+type = "text"
+title = "TBD Recommendations PRD"
